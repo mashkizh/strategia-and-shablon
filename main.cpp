@@ -8,12 +8,63 @@
 using namespace std;
 
 // Реализация паттерна "Стратегия"
+enum class FeedingStrategyEnum : int
+{
+  Predator,
+  Herbivore,
+  FilterFeeder,
+  None
+};
+class FeedingStrategy {
+public:
+  virtual ~FeedingStrategy() {}
+  virtual void Feed() = 0;
+};
+
+class PredatorStrategy : public FeedingStrategy {
+  void Feed() { cout << "Hunting other fish..."; }
+};
+
+class HerbivoreStrategy : public FeedingStrategy {
+  void Feed() { cout << "Eating algae and plants..."; }
+};
+
+class FilterFeederStrategy : public FeedingStrategy {
+  void Feed() { cout << "Filtering plankton from water..."; }
+};
+// Фабричный метод для создания стратегий
+FeedingStrategy* CreateFeedingStrategy(FeedingStrategyEnum strategy)
+{
+  switch(strategy) {
+    case FeedingStrategyEnum::Predator: return new PredatorStrategy;
+    case FeedingStrategyEnum::Herbivore: return new HerbivoreStrategy;
+    case FeedingStrategyEnum::FilterFeeder: return new FilterFeederStrategy;
+    default: return nullptr;
+  }
+}
+
 class Fish // Родительский (базовый) класс "рыбы"
 {
 private: // "Закрытые" компоненты (не доступны в унаследованных классах)
     string name;
     double length;
     double weight;
+    FeedingStrategy* feedingStrategy;
+    void SetFeedingStrategy(FeedingStrategy* strategy)
+    {
+        if(feedingStrategy != nullptr) delete feedingStrategy;
+        feedingStrategy = strategy;
+    }
+
+    void PerformFeeding()
+    {
+        if(feedingStrategy == nullptr)
+            {
+            cout << "No feeding strategy set!";
+            return;
+            }
+        feedingStrategy->Feed();
+    }
 protected: // "Защищенные" компоненты (доступны в унаследованных классах, но не доступны внешнему наблюдателю)
     bool yadovitaya;
 
@@ -44,6 +95,7 @@ Fish::Fish(string name, double length, double weight) :
 Fish::~Fish()
 {
     cout << "Deleting fish..." << endl;
+    if(feedingStrategy != nullptr) delete feedingStrategy;
 }
 
 class Losos : public Fish // Класс-наследник
@@ -68,6 +120,7 @@ Losos::Losos(string name, double length, double weight, string sreda) : Fish("Lo
     yadovitaya = false;
 
     cout << "Creating losos ..." << endl;
+
 }
 
 // Реализация деструктора
