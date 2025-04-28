@@ -65,6 +65,15 @@ protected:
         }
         feedingStrategy->Feed();
     }
+    virtual void Born() { cout << getName() << " is born." << endl; } // шаблонный метод для подклассов
+    virtual void Grow()
+    {
+        cout << getName() << " is growing. ";
+        PerformFeeding();
+        cout << endl;
+    }
+    virtual void Reproduce() { cout << reproduce() << endl; }
+    virtual void Die() { cout << getName() << " dies." << endl; }
 
 public:
     Fish(string name, double length, double weight);
@@ -78,6 +87,13 @@ public:
     virtual string reproduce() const { return "1"; }
     virtual string swim() const { return "1"; }
     void Feed() { PerformFeeding(); }
+    void LifeCycle() //шаблонный метод
+    {
+        Born();
+        Grow();
+        Reproduce();
+        Die();
+    }
 };
 // Реализация конструктора
 Fish::Fish(string name, double length, double weight) :
@@ -282,6 +298,7 @@ int main()
         {
         delete fishArray.GetElement(i);
         }
+
     cout<<"END"<<endl;
 
 
