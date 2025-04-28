@@ -279,13 +279,14 @@ int main()
     cout<<"Creating massiv of fish"<<endl;
     cout << endl;
     ArrayClass<Fish*> fishArray;
-    for(size_t i=0; i<6; i++) {
+    for(size_t i=0; i<5; i++) {
         int fish_num = rand()%3+1;
         FishType fish_type = static_cast<FishType>(fish_num);
         Fish *newFish = CreateFish(fish_type);
         fishArray.Add(newFish);
+
     }
-    cout << "Strategia";
+    wcout << L"Реализация стратегии"<< endl;
     for(size_t i=0; i<fishArray.Size(); i++) {
         Fish* fish = fishArray.GetElement(i);
         cout << fish->getName() << ": ";
@@ -295,10 +296,22 @@ int main()
     cout<<endl;
 
     for(size_t i=0; i<fishArray.Size(); i++)
-        {
+    {
         delete fishArray.GetElement(i);
-        }
-
+    }
+    //Демонстрация шаблонного метода
+    wcout << L"\n Жизненный цикл разных рыб \n";
+    Fish* Fish1 = CreateFish(FishType::Losos);
+    Fish1->LifeCycle();
+    delete Fish1;
+    cout << endl;
+    Fish1 = CreateFish(FishType::Fugu);
+    Fish1->LifeCycle();
+    delete Fish1;
+    cout << endl;
+    Fish1 = CreateFish(FishType::Shark);
+    Fish1->LifeCycle();
+    delete Fish1;
     cout<<"END"<<endl;
 
 
