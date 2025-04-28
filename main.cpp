@@ -43,52 +43,45 @@ FeedingStrategy* CreateFeedingStrategy(FeedingStrategyEnum strategy)
   }
 }
 
-class Fish // Родительский (базовый) класс "рыбы"
-{
-private: // "Закрытые" компоненты (не доступны в унаследованных классах)
+class Fish {
+private:
     string name;
     double length;
     double weight;
-    FeedingStrategy* feedingStrategy;
-protected: // "Защищенные" компоненты (доступны в унаследованных классах, но не доступны внешнему наблюдателю)
+
+protected:
     bool yadovitaya;
+    FeedingStrategy* feedingStrategy;
 
-public: // "Открытые" компоненты, определяющие интерфейс класса
-
-    Fish(string name, double length, double weight); // Конструктор
-    virtual ~Fish(); // Деструктор (объявлен виртуальным, чтобы обеспечить корректное уничтожение унаследованных классов)
-
-    // Функция с реализацией
-    string getName() const { return name; }
-    double getLength() const { return length; }
-    double getWeight() const { return weight; }
-
-    // Абстрактная функция
-    virtual void eat() = 0;
-    virtual string reproduce() const {return "1";}
-    virtual string swim() const {return "1";}
-
-    //стратегия
-    void SetFeedingStrategy(FeedingStrategy* strategy)
-    {
+    void SetFeedingStrategy(FeedingStrategy* strategy) {
         if(feedingStrategy != nullptr) delete feedingStrategy;
         feedingStrategy = strategy;
     }
 
-    void PerformFeeding()
-    {
-        if(feedingStrategy == nullptr)
-            {
+    void PerformFeeding() {
+        if(feedingStrategy == nullptr) {
             cout << "No feeding strategy set!";
             return;
-            }
+        }
         feedingStrategy->Feed();
     }
-};
 
+public:
+    Fish(string name, double length, double weight);
+    virtual ~Fish();
+
+    string getName() const { return name; }
+    double getLength() const { return length; }
+    double getWeight() const { return weight; }
+
+    virtual void eat() = 0;
+    virtual string reproduce() const { return "1"; }
+    virtual string swim() const { return "1"; }
+    void Feed() { PerformFeeding(); }
+};
 // Реализация конструктора
 Fish::Fish(string name, double length, double weight) :
-    name(name), length(length), weight(weight), yadovitaya(false)
+    name(name), length(length), weight(weight), yadovitaya(false), feedingStrategy(nullptr)
 {
     cout << "Creating fish..." << endl;
 }
@@ -267,7 +260,7 @@ void swimmingAll(Iterator<Fish*> *it)
 int main()
 {
     setlocale(LC_ALL, "Russian");
-    wcout<<L"Создание массива рыб"<<endl;
+    cout<<"Creating massiv of fish"<<endl;
     cout << endl;
     ArrayClass<Fish*> fishArray;
     for(size_t i=0; i<6; i++) {
@@ -276,18 +269,20 @@ int main()
         Fish *newFish = CreateFish(fish_type);
         fishArray.Add(newFish);
     }
-    cout << "\n=== Feeding Strategies ===\n";
+    cout << "Strategia";
     for(size_t i=0; i<fishArray.Size(); i++) {
         Fish* fish = fishArray.GetElement(i);
         cout << fish->getName() << ": ";
-        fish->PerformFeeding();
+        fish->Feed();
         cout << endl;
     }
+    cout<<endl;
+
     for(size_t i=0; i<fishArray.Size(); i++)
         {
         delete fishArray.GetElement(i);
         }
-
+    cout<<"END"<<endl;
 
 
     return 0;
