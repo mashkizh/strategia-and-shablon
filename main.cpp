@@ -50,21 +50,6 @@ private: // "Закрытые" компоненты (не доступны в у
     double length;
     double weight;
     FeedingStrategy* feedingStrategy;
-    void SetFeedingStrategy(FeedingStrategy* strategy)
-    {
-        if(feedingStrategy != nullptr) delete feedingStrategy;
-        feedingStrategy = strategy;
-    }
-
-    void PerformFeeding()
-    {
-        if(feedingStrategy == nullptr)
-            {
-            cout << "No feeding strategy set!";
-            return;
-            }
-        feedingStrategy->Feed();
-    }
 protected: // "Защищенные" компоненты (доступны в унаследованных классах, но не доступны внешнему наблюдателю)
     bool yadovitaya;
 
@@ -82,6 +67,23 @@ public: // "Открытые" компоненты, определяющие и�
     virtual void eat() = 0;
     virtual string reproduce() const {return "1";}
     virtual string swim() const {return "1";}
+
+    //стратегия
+    void SetFeedingStrategy(FeedingStrategy* strategy)
+    {
+        if(feedingStrategy != nullptr) delete feedingStrategy;
+        feedingStrategy = strategy;
+    }
+
+    void PerformFeeding()
+    {
+        if(feedingStrategy == nullptr)
+            {
+            cout << "No feeding strategy set!";
+            return;
+            }
+        feedingStrategy->Feed();
+    }
 };
 
 // Реализация конструктора
@@ -118,7 +120,7 @@ public:
 Losos::Losos(string name, double length, double weight, string sreda) : Fish("Losos", length, weight), sreda(sreda) //
 {
     yadovitaya = false;
-
+    SetFeedingStrategy(CreateFeedingStrategy(FeedingStrategyEnum::Predator));
     cout << "Creating losos ..." << endl;
 
 }
@@ -161,7 +163,9 @@ public:
 Shark::Shark(string name, double length, double weight, string attack_type) : Fish("Shark", length, weight),  attack_type(attack_type) //
 {
     yadovitaya = false;
+    SetFeedingStrategy(CreateFeedingStrategy(FeedingStrategyEnum::Predator));
     cout << "Creating shark..." << endl;
+
 }
 
 Shark::~Shark()
@@ -201,6 +205,7 @@ public:
 Fugu::Fugu(string name, double length, double weight, string colour) : Fish("Fugu", length, weight),  colour(colour) //
 {
     yadovitaya = true;
+    SetFeedingStrategy(CreateFeedingStrategy(FeedingStrategyEnum::Herbivore));
     cout << "Creating Fugu..." << endl;
 }
 
@@ -258,184 +263,30 @@ void swimmingAll(Iterator<Fish*> *it)
         cout<<currentFish->swim()<<endl;
     }
 }
-// Декоратор итератора для выделения рыб по длине
 
-class FishLenghtDecorator : public IteratorDecorator<class Fish*>
-{
-private:
-    double TargetLenght;
-
-public:
-    FishLenghtDecorator(Iterator<Fish*> *it, double Lenght)
-    : IteratorDecorator<Fish*>(it), TargetLenght(Lenght) {}
-
-    void First()
-    {
-        It->First();
-        while(!It->IsDone() && It->GetCurrent()->getLength() < TargetLenght)
-        {
-            It->Next();
-        }
-    }
-
-    void Next()
-    {
-        do
-        {
-            It->Next();
-
-        } while(!It->IsDone() && It->GetCurrent()->getLength() < TargetLenght);
-    }
-};
-// Декоратор итератора для выделения имени рыб
-
-class FishNameDecorator : public IteratorDecorator<class Fish*>
-{
-private:
-    string TargetName;
-
-public:
-    FishNameDecorator(Iterator<Fish*> *it, string name)
-    : IteratorDecorator<Fish*>(it), TargetName(name) {}
-
-    void First()
-    {
-        It->First();
-        while(!It->IsDone() && It->GetCurrent()->getName() == TargetName)
-        {
-            It->Next();
-        }
-    }
-
-    void Next()
-    {
-        do
-        {
-            It->Next();
-
-        } while(!It->IsDone() && It->GetCurrent()->getName() == TargetName);
-    }
-};
-// Декоратор итератора для выделения имени рыб
-
-class FishWeightDecorator : public IteratorDecorator<class Fish*>
-{
-private:
-    double TargetWeight;
-
-public:
-    FishWeightDecorator(Iterator<Fish*> *it, double weight)
-    : IteratorDecorator<Fish*>(it), TargetWeight(weight) {}
-
-    void First()
-    {
-        It->First();
-        while(!It->IsDone() && It->GetCurrent()->getWeight() < TargetWeight)
-        {
-            It->Next();
-        }
-    }
-
-    void Next()
-    {
-        do
-        {
-            It->Next();
-
-        } while(!It->IsDone() && It->GetCurrent()->getWeight() < TargetWeight);
-    }
-};
 int main()
 {
     setlocale(LC_ALL, "Russian");
-    /*wcout << L"Какую рыбу создать (1 - лосось, 2 - акула, 3 - фугу)?" << endl;
-    FishType type = FishType::Undefined;
-    int ii;
-    cin >> ii;
-    type = static_cast<FishType>(ii);*/
-
-
-    /*Fish* salmon = new Losos("Sam", 70.0, 5000.0, "River"); //если проводить ассоциацию со структурой (посмотрела, что так можно)
-    Fish* shark = new Shark("Jaws", 500.0, 150000.0, "Aggressive");
-    Fish* fugu = new Fugu("Fugu Chan", 500.0, 150000.0, "Brown");
-    vector<Fish*> aquarium;
-
-    aquarium.push_back(salmon); //по моему мнению, так проще обработать (чтобы места меньше заняло)
-    aquarium.push_back(fugu);
-    aquarium.push_back(shark);
-
-    cout << endl;
-    for (Fish* fish : aquarium) {
-        cout << "Swim: " << fish->swim() << endl;
-        cout << "Eat: " ;
-        fish->eat();
-        cout << "Reproduce: " << fish->reproduce() << endl;
-        cout << endl;
-    }
-    Fish *newFish2 = CreateFish(type);
-    newFish2->eat();
-    delete newFish2;*/
-    cout << endl;
     wcout<<L"Создание массива рыб"<<endl;
     cout << endl;
     ArrayClass<Fish*> fishArray;
-    for(size_t i=0; i<6; i++)
-    {
-        int fish_num = rand()%3+1; // Число от 1 до 3 (случайный фрукт)
+    for(size_t i=0; i<6; i++) {
+        int fish_num = rand()%3+1;
         FishType fish_type = static_cast<FishType>(fish_num);
         Fish *newFish = CreateFish(fish_type);
         fishArray.Add(newFish);
     }
-
-    wcout<< endl << L"Создание вектора рыб"<<endl;
-    VectorClass<Fish*> fishVector;
-    for(size_t i=0; i<3; i++)
-    {
-        int fish_num = rand()%3+1; // Число от 1 до 3
-        FishType fish_type = static_cast<FishType>(fish_num);
-        Fish *newFish = CreateFish(fish_type);
-        fishVector.Push(newFish);
+    cout << "\n=== Feeding Strategies ===\n";
+    for(size_t i=0; i<fishArray.Size(); i++) {
+        Fish* fish = fishArray.GetElement(i);
+        cout << fish->getName() << ": ";
+        fish->PerformFeeding();
+        cout << endl;
     }
-    cout << endl;
-    /*wcout << L"Плавание рыб, которые оказались в массиве" << endl;
-    Iterator<Fish*> *it1 = new  ArrayIterator<Fish*>(&fishArray);
-    swimmingAll(it1);
-    cout << endl;
-    wcout << L"Плавание рыб, которые оказались в векторе" << endl;
-    Iterator<Fish*> *it2 = new  VectorIterator<Fish*>(&fishVector);
-    swimmingAll(it2);
-    delete it1;
-    delete it2;
-    cout << endl << endl;*/
-    /* Обход всех коротких рыб
-    cout << endl << "Swimming all short using iterator:" << endl;
-    Iterator<Fish*> *shortIt = new FishLenghtDecorator(fishArray.GetIterator(), 75);
-    swimmingAll(shortIt);
-    delete shortIt;
-
-    // Обход всех рыб по имени Samlmon
-    wcout << endl << L"Swimming all Sam рыб using iterator:" << endl;
-    Iterator<Fish*> *nameIt = new FishNameDecorator(fishVector.GetIterator(), "Samlmon");
-    swimmingAll(nameIt);
-    delete nameIt;
-
-      // Обход всех рыб по весу
-    wcout << endl << L"Swimming all weight using iterator:" << endl;
-    Iterator<Fish*> *weihtIt = new FishWeightDecorator(fishArray.GetIterator(), 10000);
-    swimmingAll(weihtIt);
-    delete weihtIt;
-
-    cout << endl << "Swimming using adapted iterator (another container):" << endl;
-    Iterator<Fish*> *adaptedIt = new ConstIteratorAdapter<Fish*>(&fishVector);
-    Iterator<Fish*> *adaptedShortIt = new FishLenghtDecorator(new FishNameDecorator(adaptedIt, "Samlmon"), 75);
-    swimmingAll(adaptedShortIt);
-    delete adaptedShortIt;
-
-    //
-    //delete salmon;
-    //delete shark;
-    //delete fugu;*/
-
+    for(size_t i=0; i<fishArray.Size(); i++)
+        {
+        delete fishArray.GetElement(i);
+        }
 
 
 
